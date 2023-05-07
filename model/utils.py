@@ -11,23 +11,26 @@ def get_transform():
     ])
 
 def get_labels(data_dir='./model/dataset'):
-    return {label: name for label, name in enumerate(os.listdir(data_dir))}
+    return {label: name for label, name in enumerate(sorted(os.listdir(data_dir)))}
 
 def get_images(data_dir='./model/dataset'):
 
     # Define the dataset
     dataset = datasets.ImageFolder(data_dir, transform=get_transform())
 
-    return dataset
+    return dataset, get_labels(data_dir)
 
 def get_test_images(data_dir='./model/test_dataset'):
     transformer = get_transform()
     dataset = []
+    image_path = []
     for image in os.listdir(data_dir):
-        image = Image.open(f"{data_dir}/{image}")
+        path = f"{data_dir}/{image}"
+        image_path.append(path)
+        image = Image.open(path).convert('RGB')
         image = transformer(image).float()
         image = torch.autograd.Variable(image, requires_grad=True)
         image = image.unsqueeze(0)
         dataset.append(image)
 
-    return dataset
+    return dataset, image_path

@@ -1,36 +1,40 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torchvision
 import torchvision.models as models
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, random_split
-from torchinfo import summary
-from utils import *
+from .utils import *
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+def get_predictions(data_dir="./model/dataset",
+                    test_dir="./model/test_dataset",
+                    weight_dir="./model/model_weights.pth"):
 
-labels_to_name = get_labels()
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-dataset, _ = get_test_images()
-model = models.resnet50()
-num_ftrs = model.fc.in_features
+    labels_to_name = get_labels(data_dir)
 
-model.fc = nn.Linear(num_ftrs, 150) #No. of classes = 150
-model = model.to(device)
-model.load_state_dict(torch.load('./model/model_weights.pth'))
-model.eval()
+    dataset, _ = get_test_images(test_dir)
+    model = models.resnet50()
+    num_ftrs = model.fc.in_features
 
-predicts=[]
+    model.fc = nn.Linear(num_ftrs, 150) #No. of classes = 150
+    model = model.to(device)
+    model.load_state_dict(torch.load(weight_dir))
+    model.eval()
 
-for data in dataset:
-    data = data.cuda()
-    output = model(data)
-    conf_10, predicted_10 = torch.topk(output.data, k=10, dim=1)
+    predicts=[]
 
-    conf_10, predicted_10 = conf_10.tolist(), predicted_10.tolist()
-    for i in range(len(conf_10[0])):
-        print(f"{labels_to_name[predicted_10[0][i]]:12} confidence:{conf_10[0][i]:.2f}%")
-        print("======================")
+    for i in range(len(dataset[:10])):
+        data = dataset[i].cuda()
+        output = model(data)
+        conf_10, predicted_10 = torch.topk(output.data, k=10, dim=1)
+
+        conf_10, predicted_10 = conf_10.tolist(), predicted_10.tolist()
+        labels = [labels_to_name[key] for key in predicted_10[0]]
+        confs = [conf for conf in conf_10[0]]
+        predicts.append({
+            "Test": f"{i+1}",
+            "Top 10": labels,
+            "Confidence Levels": confs
+        })
+    return predicts
 
 

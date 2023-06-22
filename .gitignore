@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 trainer.ipynb
+model_sandbox.py

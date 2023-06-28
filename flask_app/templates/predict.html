@@ -1,22 +1,19 @@
 {% extends "base.html" %}
 
+{% from "bootstrap5/table.html" import render_table%}
+
 {% block content %}
-    <div class="container">
-        <img src="{{ url_for('static', filename='uploads/' + image_path) }}" width="256" height="256">
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>Pokemon</th>
-                <th>Confidence</th>
-            </tr>
-            {% for data in results["Top 10"]  %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ data }}</td>
-                <td>{{ '%0.2f' | format(results["Confidence Levels"][loop.index-1]|float) }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <div class="container-small">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='uploads/' + image_path) }}" width="256" height="256" >
+        </div>
+        {{ render_table(results, 
+                        titles=[("Rank", "Rank"), ("Pokemon", "Pokemon"), ("Confidence Level", "Confidence")], 
+                        table_classes='table-striped', 
+                        header_classes='thead-dark',
+                        responsive_class='table-responsive-sm'
+                        )
+        }}
+        <a href="{{ url_for('home') }}">Back</a>
     </div>
-    <a href="{{ url_for('home') }}">Back</a>
 {% endblock %}

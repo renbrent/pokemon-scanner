@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, redirect, url_for
 from flask_wtf import CSRFProtect, FlaskForm
 from flask_wtf.file import FileField, FileRequired
+from flask_bootstrap import Bootstrap5
 from wtforms import SubmitField
 from werkzeug.utils import secure_filename
 from model.model import model_predict
@@ -16,6 +17,7 @@ UPLOAD_FOLDER = "./static/uploads"
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
 
 

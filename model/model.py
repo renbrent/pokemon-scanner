@@ -51,8 +51,6 @@ def model_predict(image):
     conf_10, predicted_10 = torch.topk(output.data, k=10, dim=1)
 
     conf_10, predicted_10 = conf_10.tolist(), predicted_10.tolist()
-    labels = [POKEMON_NAMES[key] for key in predicted_10[0]]
-    confs = [conf for conf in conf_10[0]]
-    predict = {"Top 10": labels, "Confidence Levels": confs}
+    predict = [{"Rank": i+1, "Pokemon": POKEMON_NAMES[key], "Confidence Level": conf} for i, (key, conf) in enumerate(zip(predicted_10[0], conf_10[0]))]
 
     return predict
